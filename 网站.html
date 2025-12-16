@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简易电商网站 - 商品在线售卖</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "微软雅黑", sans-serif; }
+        body { background: #f5f5f5; color: #333; }
+        /* 头部导航 */
+        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; width: 100%; z-index: 999; }
+        .nav { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
+        .logo { font-size: 24px; font-weight: bold; color: #27ae60; }
+        .nav-menu { display: flex; gap: 30px; }
+        .nav-menu a { text-decoration: none; color: #333; font-size: 16px; transition: color 0.3s; }
+        .nav-menu a:hover { color: #27ae60; }
+        .cart-btn { position: relative; cursor: pointer; font-size: 18px; }
+        .cart-count { position: absolute; top: -8px; right: -8px; background: #e74c3c; color: #fff; width: 20px; height: 20px; border-radius: 50%; text-align: center; font-size: 12px; line-height: 20px; }
+
+        /* 商品列表区 */
+        .container { max-width: 1200px; margin: 100px auto 50px; padding: 0 20px; }
+        .title { text-align: center; margin-bottom: 40px; font-size: 28px; color: #333; }
+        .product-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .product-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: transform 0.3s; }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-img { width: 100%; height: 220px; object-fit: cover; }
+        .product-info { padding: 20px; }
+        .product-name { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+        .product-price { color: #e74c3c; font-size: 20px; font-weight: bold; margin-bottom: 15px; }
+        .add-cart { width: 100%; padding: 12px; background: #27ae60; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
+        .add-cart:hover { background: #219653; }
+
+        /* 购物车弹窗 */
+        .cart-modal { position: fixed; top: 0; right: 0; width: 380px; height: 100vh; background: #fff; box-shadow: -2px 0 10px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s; z-index: 1000; padding: 20px; overflow-y: auto; }
+        .cart-modal.show { transform: translateX(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .modal-title { font-size: 20px; font-weight: bold; }
+        .close-cart { font-size: 22px; cursor: pointer; color: #666; }
+        .cart-empty { text-align: center; padding: 50px 0; color: #999; }
+        .cart-item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .cart-item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 5px; }
+        .cart-item-info { flex: 1; }
+        .cart-item-name { font-size: 16px; margin-bottom: 5px; }
+        .cart-item-price { color: #e74c3c; font-weight: bold; }
+        .del-item { color: #999; cursor: pointer; margin-top: 5px; transition: color 0.3s; }
+        .del-item:hover { color: #e74c3c; }
+        .cart-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+        .total-price { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .checkout-btn { width: 100%; padding: 12px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+
+        /* 底部 */
+        footer { background: #333; color: #fff; text-align: center; padding: 30px 0; margin-top: 50px; }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .nav-menu { gap: 20px; }
+            .cart-modal { width: 100%; }
+            .product-list { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <div class="nav">
+            <div class="logo">好物商城</div>
+            <div class="nav-menu">
+                <a href=" ">首页</a >
+                <a href="#">全部商品</a >
+                <a href="#">关于我们</a >
+                <a href="#">联系客服</a >
+            </div>
+            <div class="cart-btn" id="cartBtn">
+                🛒 购物车
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 商品列表区 -->
+    <div class="container">
+        <h2 class="title">热门商品</h2>
+        <div class="product-list" id="productList">
+            <!-- 商品1 -->
+            <div class="product-card">
+                <img src="C:\Users\慧怡\Desktop\小麦4_244.png" class="product-img"alt="商品图片">
+                <div class="product-info">
+                    <div class="product-name">小麦玩偶文创</div>
+                    <div class="product-price">¥199.00</div>
+                    <button class="add-cart" data-name="小麦玩偶文创" data-price="199" data-img="https://picsum.photos/500/400?random=1">加入购物车</button>
+                </div>
+            </div>
+            <!-- 商品2 -->
+            <div class="product-card">
+                <img src="https://picsum.photos/500/400?random=2" class="product-img" alt="商品图片">
+                <div class="product-info">
+                    <div class="product-name">小麦抱枕</div>
+                    <div class="product-price">¥399.00</div>
+                    <button class="add-cart" data-name="小麦抱枕" data-price="399" data-img="https://picsum.photos/500/400?random=2">加入购物车</button>
+                </div>
+            </div>
+            <!-- 商品3 -->
+            <div class="product-card">
+                <img src="https://picsum.photos/500/400?random=3" class="product-img" alt="商品图片">
+                <div class="product-info">
+                    <div class="product-name">小麦笔记本</div>
+                    <div class="product-price">¥89.00</div>
+                    <button class="add-cart" data-name="小麦笔记本" data-price="89" data-img="https://picsum.photos/500/400?random=3">加入购物车</button>
+                </div>
+            </div>
+            <!-- 商品4 -->
+            <div class="product-card">
+                <img src="https://picsum.photos/500/400?random=4" class="product-img" alt="商品图片">
+                <div class="product-info">
+                    <div class="product-name">茶杯</div>
+                    <div class="product-price">¥1299.00</div>
+                    <button class="add-cart" data-name="茶杯" data-price="1299" data-img="https://picsum.photos/500/400?random=4">加入购物车</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 购物车弹窗 -->
+    <div class="cart-modal" id="cartModal">
+        <div class="modal-header">
+            <div class="modal-title">我的购物车</div>
+            <div class="close-cart" id="closeCart">×</div>
+        </div>
+        <div class="cart-content" id="cartContent">
+            <div class="cart-empty" id="cartEmpty">
+                购物车是空的，快去添加商品吧~
+            </div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="total-price">总计：¥<span id="totalPrice">0</span>.00</div>
+            <button class="checkout-btn">去结算</button>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer>
+        <div>好物商城 © 2025 版权所有 | 在线商品售卖平台</div>
+    </footer>
+
+    <script>
+        // 购物车数据
+        let cartList = [];
+        // DOM元素
+        const cartBtn = document.getElementById('cartBtn');
+        const closeCart = document.getElementById('closeCart');
+        const cartModal = document.getElementById('cartModal');
+        const cartCount = document.getElementById('cartCount');
+        const cartContent = document.getElementById('cartContent');
+        const cartEmpty = document.getElementById('cartEmpty');
+        const cartFooter = document.getElementById('cartFooter');
+        const totalPrice = document.getElementById('totalPrice');
+        const addCartBtns = document.querySelectorAll('.add-cart');
+
+        // 打开购物车
+        cartBtn.addEventListener('click', () => {
+            cartModal.classList.add('show');
+            renderCart();
+        });
+
+        // 关闭购物车
+        closeCart.addEventListener('click', () => {
+            cartModal.classList.remove('show');
+        });
+
+        // 点击空白关闭购物车
+        cartModal.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.classList.remove('show');
+            }
+        });
+
+        // 添加商品到购物车
+        addCartBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const name = btn.getAttribute('data-name');
+                const price = Number(btn.getAttribute('data-price'));
+                const img = btn.getAttribute('data-img');
+                // 检查是否已在购物车
+                const isExist = cartList.some(item => item.name === name);
+                if (isExist) {
+                    alert('该商品已在购物车中~');
+                    return;
+                }
+                cartList.push({ name, price, img });
+                updateCartCount();
+                alert('添加购物车成功！');
+            });
+        });
+
+        // 更新购物车数量
+        function updateCartCount() {
+            cartCount.textContent = cartList.length;
+        }
+
+        // 渲染购物车
+        function renderCart() {
+            if (cartList.length === 0) {
+                cartEmpty.style.display = 'block';
+                cartFooter.style.display = 'none';
+                cartContent.innerHTML = '';
+                return;
+            }
+            cartEmpty.style.display = 'none';
+            cartFooter.style.display = 'block';
+            // 计算总价
+            let total = 0;
+            cartList.forEach(item => total += item.price);
+            totalPrice.textContent = total;
+            // 渲染商品
+            let html = '';
+            cartList.forEach((item, index) => {
+                html += `
+                    <div class="cart-item">
+                        < img src="${item.img}" class="cart-item-img" alt="${item.name}">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">¥${item.price}.00</div>
+                            <div class="del-item" onclick="deleteItem(${index})">删除</div>
+                        </div>
+                    </div>
+                `;
+            });
+            cartContent.innerHTML = html;
+        }
+
+        // 删除购物车商品
+        function deleteItem(index) {
+            cartList.splice(index, 1);
+            updateCartCount();
+            renderCart();
+        }
+
+        // 结算按钮
+        document.querySelector('.checkout-btn').addEventListener('click', () => {
+            alert('结算成功！请等待商品发货~');
+            cartList = [];
+            updateCartCount();
+            renderCart();
+        });
+    </script>
+</body>
+</html>
